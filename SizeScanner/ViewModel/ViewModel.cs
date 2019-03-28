@@ -117,7 +117,7 @@ namespace SizeScanner {
             if (DirectoryModel.IsRootInvalidOrNull()) {
                 return;
             }
-            ShowAnchorDirectory();
+            ShowAnchorDirectory(true, true);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -145,14 +145,14 @@ namespace SizeScanner {
 
         #endregion
 
-        async void ShowAnchorDirectory() {
+        async void ShowAnchorDirectory(bool shouldPopOnCancel, bool showProgress) {
             string anchorPath = AnchorPath;
             var newAnchor = DirectoryModel.GetFileSystemItemInfo(anchorPath);
             if (newAnchor == null) {
                 CurrentDirName = $"Не найдена папка {anchorPath}. Советую перечитать папки с диска.";
                 CurrentDirSize = 0;
                 PieItems.Clear();
-                if (AnchorPaths.Count > 0) {
+                if (shouldPopOnCancel && AnchorPaths.Count > 0) {
                     AnchorPaths.Pop();
                 }
                 return;
@@ -162,10 +162,10 @@ namespace SizeScanner {
             ConverterCancelationTokenSource = new CancellationTokenSource();
             List<PiePieceItem> newPieItems;
             try {
-                newPieItems = await ConvertFileSystemItemToPiePieceItem(newAnchor);
+                newPieItems = await ConvertFileSystemItemToPiePieceItem(newAnchor, showProgress);
             }
             catch (OperationCanceledException) {
-                if (AnchorPaths.Count > 0) {
+                if (shouldPopOnCancel && AnchorPaths.Count > 0) {
                     AnchorPaths.Pop();
                 }
                 return;
@@ -176,9 +176,10 @@ namespace SizeScanner {
             AnchorDirSize = newAnchor.Size;
         }
 
-        ConfiguredTaskAwaitable<List<PiePieceItem>> ConvertFileSystemItemToPiePieceItem(FileSystemItem fileSystemItem) {
+        ConfiguredTaskAwaitable<List<PiePieceItem>> ConvertFileSystemItemToPiePieceItem(FileSystemItem fileSystemItem, bool showProgress) {
             return Task.Run(() => {
-                Begin();
+                if (showProgress)
+                    Begin();
                 List<PiePieceItem> result = new List<PiePieceItem>(fileSystemItem.InnerItems.Count);
                 int index = 0;
                 DirectoryModel.DoTaskUnderRWLockForReading(() => {
@@ -188,10 +189,12 @@ namespace SizeScanner {
                         ConvertFileSystemItemToPiePieceItemCore(innerItem, piePieceItem, 1);
                         result.Add(piePieceItem);
                         index++;
-                        SetProgress(progressChange * index);
+                        if (showProgress)
+                            SetProgress(progressChange * index);
                     }
                 });
-                End();
+                if (showProgress)
+                    End();
                 return result;
             }).ConfigureAwait(false);
         }
@@ -241,7 +244,7 @@ namespace SizeScanner {
 
         public void MouseClickOnPiece(string pathPart) {
             AnchorPaths.Push(Path.Combine(AnchorPath, pathPart));
-            ShowAnchorDirectory();
+            ShowAnchorDirectory(true, true);
         }
 
         public void ReAnalyze() {
@@ -255,7 +258,7 @@ namespace SizeScanner {
             if (AnchorPaths.Count <= 0)
                 return;
             AnchorPaths.Pop();
-            ShowAnchorDirectory();
+            ShowAnchorDirectory(true, true);
         }
 
         public void BrowseParent() {
@@ -269,7 +272,7 @@ namespace SizeScanner {
                 newAnchorPath += "\\";
             }
             AnchorPaths.Push(newAnchorPath);
-            ShowAnchorDirectory();
+            ShowAnchorDirectory(true, true);
         }
 
         private void DirectoryModel_OnRenamedFileSystemItem(object sender, FileSystemInfoRenamedEventArgs e) {
@@ -347,19 +350,19 @@ namespace SizeScanner {
                 AnchorPaths.Push(t);
             }
             if (IsChangedVisible(e.FullName)) {
-                ShowAnchorDirectory();
+                ShowAnchorDirectory(false, false);
             }
         }
 
         private void DirectoryModel_OnCreatedFileSystemItem(object sender, FileSystemInfoPathEventArgs e) {
             if(IsChangedVisible(e.FullName)) {
-                ShowAnchorDirectory();
+                ShowAnchorDirectory(false, false);
             }
         }
 
         private void DirectoryModel_OnSizeChangedFileSystemItem(object sender, FileSystemInfoPathEventArgs e) {
             if (IsChangedVisible(e.FullName)) {
-                ShowAnchorDirectory();
+                ShowAnchorDirectory(false, false);
             }
         }
 
