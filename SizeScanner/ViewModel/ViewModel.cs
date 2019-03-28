@@ -297,24 +297,26 @@ namespace SizeScanner {
             PiePieceItem currentItem = null;
             string[] pathItems = e.OldFullName.Substring(DirectoryModel.GetRootName().Length).Split(new[] {Path.DirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
             foreach (string pathItem in pathItems) {
-                int l = 0;
-                int r = currentPieItems.Count - 1;
-                while (l <= r) {
-                    int m = l + (r - l) / 2;
-                    PiePieceItem item = currentPieItems[m];
-                    if (item.Name == pathItem) {
-                        l = m;
-                        break;
+                if (currentPieItems.Count > 0) {
+                    int l = 0;
+                    int r = currentPieItems.Count - 1;
+                    while (l <= r) {
+                        int m = l + (r - l) / 2;
+                        PiePieceItem item = currentPieItems[m];
+                        if (item.Name == pathItem) {
+                            l = m;
+                            break;
+                        }
+                        if (String.Compare(pathItem, item.Name, StringComparison.Ordinal) < 0) {
+                            r = m - 1;
+                        }
+                        else {
+                            l = m + 1;
+                        }
                     }
-                    if (String.Compare(pathItem, item.Name, StringComparison.Ordinal) < 0) {
-                        r = m - 1;
-                    }
-                    else {
-                        l = m + 1;
-                    }
+                    currentItem = currentPieItems[l];
                 }
-                currentItem = currentPieItems[l];
-                if (currentItem.Name != pathItem) {
+                if (currentItem ==null || currentItem.Name != pathItem) {
                     break;
                 }
                 currentPieItems = currentItem.Items;
@@ -322,11 +324,11 @@ namespace SizeScanner {
             if (currentItem == null || currentItem.Name != pathItems[pathItems.Length - 1]) {
                 return;
             }
-            var fileSystemInfo = DirectoryModel.GetFileSystemItemInfo(e.FullName);
-            if (fileSystemInfo == null) {
+            var fileSystemItem = DirectoryModel.GetFileSystemItemInfo(e.FullName);
+            if (fileSystemItem == null) {
                 return;
             }
-            currentItem.Name = fileSystemInfo.Name;
+            currentItem.Name = fileSystemItem.Name;
         }
 
         static bool ContainsPath(string a, string b) {
