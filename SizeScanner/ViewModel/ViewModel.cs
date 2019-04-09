@@ -307,16 +307,16 @@ namespace SizeScanner {
                             l = m;
                             break;
                         }
-                        if (String.Compare(pathItem, item.Name, StringComparison.Ordinal) < 0) {
+                        if (string.Compare(pathItem, item.Name, StringComparison.Ordinal) < 0) {
                             r = m - 1;
                         }
                         else {
                             l = m + 1;
                         }
                     }
-                    currentItem = currentPieItems[l];
+                    currentItem = l < 0 || l >= currentPieItems.Count ? null : currentPieItems[l];
                 }
-                if (currentItem ==null || currentItem.Name != pathItem) {
+                if (currentItem == null || currentItem.Name != pathItem) {
                     break;
                 }
                 currentPieItems = currentItem.Items;
