@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 
 namespace SizeScanner.Model {
     class ModelCalculator {
-        //TODO
-        //для тестирования калькулятора надо сделать декораторы над DirectoryInfo, FileInfo и сервис с (Get | Enumerate)(Directories | Files).
-        //В релизе сервис будет работать с декораторами на основе реальных DirectoryInfo, для тестов юзать тестовый сервис и декораторы для DirectoryInfo, FileInfo
         IServiceProvider ServiceProvider { get; }
 
         IProgressIndicatorService ProgressIndicator { get => ServiceProvider.GetService(typeof(IProgressIndicatorService)) as IProgressIndicatorService; }

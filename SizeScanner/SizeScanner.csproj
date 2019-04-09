@@ -72,7 +72,6 @@
     <Compile Include="Model\Services.cs" />
     <Compile Include="Model\ModelUpdater.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Tests.cs" />
     <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\ViewModel.cs" />
     <Page Include="Chart\SmartPieChart.xaml">

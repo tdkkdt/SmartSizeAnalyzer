@@ -40,23 +40,23 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Border Background="AliceBlue" Grid.Column="1"></Border>
-            <Label Content="Папка : " HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0"/>
+            <Label Content="Folder : " HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0"/>
             <Label Content="{Binding CurrentDirName, Mode = OneWay}" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
-            <Label Content="Размер : " HorizontalAlignment="Right" Grid.Row="1" Grid.Column="0"/>
+            <Label Content="Size : " HorizontalAlignment="Right" Grid.Row="1" Grid.Column="0"/>
             <Label Content="{Binding CurrentDirSize, Mode = OneWay, Converter={StaticResource BytesToDirSizeConverter}}" HorizontalContentAlignment="Left" Grid.Row ="1" Grid.Column="1"/>
             <StackPanel Grid.Row ="0" Grid.Column="2" Orientation="Horizontal" >
-                <Button Margin="8, 0, 4, 0" Command="Open" ToolTip="Открыть папку">
+                <Button Margin="8, 0, 4, 0" Command="Open" ToolTip="Open folder">
                     <Image Source="{StaticResource ImageFolderOpen}"/>
                 </Button>
-                <Button Margin="4, 0, 8, 0" Command="Refresh" ToolTip="Перечитать папку" IsEnabled="{Binding Ready}">
+                <Button Margin="4, 0, 8, 0" Command="Refresh" ToolTip="Reread folder" IsEnabled="{Binding Ready}">
                     <Image Source="{StaticResource ImageReload}"/>
                 </Button>
             </StackPanel>
             <StackPanel Grid.Row ="1" Grid.Column="2" Orientation="Horizontal" >
-                <Button Margin="8, 0, 4, 0" ToolTip="Назад" IsEnabled="{Binding Ready}" Command="BrowseBack">
+                <Button Margin="8, 0, 4, 0" ToolTip="Back" IsEnabled="{Binding Ready}" Command="BrowseBack">
                     <Image Source="{StaticResource ImageBack}"/>
                 </Button>
-                <Button Margin="4, 0, 8, 0" ToolTip="Наверх" IsEnabled="{Binding Ready}" Command="BrowseHome">
+                <Button Margin="4, 0, 8, 0" ToolTip="Parent" IsEnabled="{Binding Ready}" Command="BrowseHome">
                     <Image Source="{StaticResource ImageGoToParent}"/>
                 </Button>
             </StackPanel>
@@ -70,7 +70,7 @@
                 </ControlTemplate>
                 <ControlTemplate x:Key="ProgressBarTemplate">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Label Content="Чтение папки" HorizontalAlignment="Center"/>
+                        <Label Content="Reading the folder" HorizontalAlignment="Center"/>
                         <ProgressBar Width="400" Height ="20" Value = "{Binding Progress, Mode = OneWay}"/>
                     </StackPanel>
                 </ControlTemplate>

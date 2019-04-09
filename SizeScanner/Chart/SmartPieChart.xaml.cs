@@ -38,7 +38,7 @@ namespace SmartPieChart {
 
         static void ItemsSourcePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             SmartPieChart pieChart = d as SmartPieChart;
-            pieChart?.UpdateItemsSource(e.OldValue as List<PiePieceItem>);
+            pieChart?.UpdateItemsSource();
         }
 
         public SmartPieChart() {
@@ -51,47 +51,11 @@ namespace SmartPieChart {
             GeneratePiePieces();
         }
 
-        void UpdateItemsSource(List<PiePieceItem> previous) {
-            if (previous != null) {
-                //Unsubscribe(previous);
-            }
+        void UpdateItemsSource() {
             if (ItemsSource == null)
                 return;
-            //Subscribe(ItemsSource);
-
             GeneratePiePieces();
         }
-
-        //void Unsubscribe(List<PiePieceItem> itemsSource) {
-        //    //previous.CollectionChanged -= ItemsSourceCollectionChanged;
-        //}
-
-        //void Subscribe(List<PiePieceItem> itemsSource) {
-        //    //itemsSource.CollectionChanged += ItemsSourceCollectionChanged;
-        //    //ObserveBoundCollectionChanges(itemsSource);
-        //}
-
-        //void ItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-        //    GeneratePiePieces();
-        //    ObserveBoundCollectionChanges();
-        //}
-
-        //void ObserveBoundCollectionChanges() {
-        //    CollectionView myCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(this.DataContext);
-
-        //    if (myCollectionView == null)
-        //        return;
-
-        //    foreach (object item in myCollectionView) {
-        //        if (item is INotifyPropertyChanged observable) {
-        //            observable.PropertyChanged += ItemPropertyChanged;
-        //        }
-        //    }
-        //}
-
-        //void ItemPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        //    GeneratePiePieces();
-        //}
 
         void GeneratePiePieces() {
             Canvas.Children.Clear();

@@ -74,7 +74,6 @@ namespace SmartPieChart {
         public double CenterY { get; set; }
         public double RotationAngle { get; set; }
         public double WedgeAngle { get; set; }
-        public string Label => PiePieceItem.Name;
         PiePieceItem PiePieceItem { get; set; }
 
         public PiePiece(PiePieceItem piePieceItem) {
@@ -100,7 +99,6 @@ namespace SmartPieChart {
 
             double wedgeAngle = WedgeAngle;
             if (wedgeAngle == 360) {
-                // я хз как сделать лучше. долго мучался.
                 wedgeAngle = 359.99;
             }
             Point innerArcEndPoint = PolarToCartesian(RotationAngle + wedgeAngle, InnerRadius);

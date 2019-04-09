@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SizeScanner", "SizeScanner\SizeScanner.csproj", "{5A9F89FE-544C-46DD-9184-FC2918E22F52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SizeScannerTests", "SizeScannerTests\SizeScannerTests.csproj", "{9C19AC38-6316-48BB-A6AE-E83E4276AE58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5A9F89FE-544C-46DD-9184-FC2918E22F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A9F89FE-544C-46DD-9184-FC2918E22F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A9F89FE-544C-46DD-9184-FC2918E22F52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C19AC38-6316-48BB-A6AE-E83E4276AE58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C19AC38-6316-48BB-A6AE-E83E4276AE58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C19AC38-6316-48BB-A6AE-E83E4276AE58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C19AC38-6316-48BB-A6AE-E83E4276AE58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
