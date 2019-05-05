@@ -325,6 +325,9 @@ namespace SizeScanner.Model {
             else if (File.Exists(fullName)) {
                 try {
                     FileInfo fi = new FileInfo(fullName);
+                    if (!fi.Exists) {
+                        return false;
+                    }
                     newItem = new FileSystemItem(fi);
                 }
                 catch (Exception e) when (e is SecurityException || e is UnauthorizedAccessException) {
