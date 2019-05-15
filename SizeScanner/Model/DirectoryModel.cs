@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SizeScanner.Model {
     class DirectoryModel : IServiceContainer, IDisposable {
-        static readonly char[] DirSeperator = {Path.DirectorySeparatorChar};
+        static readonly char[] DirSeparator = {Path.DirectorySeparatorChar};
         ServiceContainer ServiceContainer { get; set; }
         FileSystemItem Root { get; set; }
         FileSystemWatcher Watcher { get; set; }
@@ -165,7 +162,7 @@ namespace SizeScanner.Model {
 
         FileSystemItem GetFileSystemItemByRelativePathCore(string relativePath) {
             FileSystemItem current = Root;
-            string[] pathItems = relativePath.Split(DirSeperator, StringSplitOptions.RemoveEmptyEntries);
+            string[] pathItems = relativePath.Split(DirSeparator, StringSplitOptions.RemoveEmptyEntries);
             foreach (string s in pathItems) {
                 if (!current.InnerItems.TryGetValue(new FileSystemItem(s), out FileSystemItem next)) {
                     return null;
@@ -192,7 +189,7 @@ namespace SizeScanner.Model {
         List<FileSystemItem> GetFileSystemItemPathByRelativePathCore(string relativePath) {
             List<FileSystemItem> result = new List<FileSystemItem>();
             FileSystemItem current = Root;
-            string[] pathItems = relativePath.Split(DirSeperator, StringSplitOptions.RemoveEmptyEntries);
+            string[] pathItems = relativePath.Split(DirSeparator, StringSplitOptions.RemoveEmptyEntries);
             foreach (string s in pathItems) {
                 result.Add(current);
                 if (!current.InnerItems.TryGetValue(new FileSystemItem(s), out FileSystemItem next)) {

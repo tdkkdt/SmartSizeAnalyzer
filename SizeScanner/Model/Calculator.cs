@@ -9,10 +9,16 @@ namespace SizeScanner.Model {
     class ModelCalculator {
         IServiceProvider ServiceProvider { get; }
 
-        IProgressIndicatorService ProgressIndicator { get => ServiceProvider.GetService(typeof(IProgressIndicatorService)) as IProgressIndicatorService; }
+        IProgressIndicatorService ProgressIndicator { get; }
+        IFileSystemService FileSystemService { get; }
 
         public ModelCalculator(IServiceProvider serviceProvider) {
             ServiceProvider = serviceProvider;
+            ProgressIndicator = ServiceProvider.GetService(typeof(IProgressIndicatorService)) as IProgressIndicatorService;
+            FileSystemService = ServiceProvider.GetService(typeof(IFileSystemService)) as IFileSystemService;
+            if (FileSystemService == null) {
+                throw new ArgumentException("FileSystemService must exist and not be null.", nameof(FileSystemService));
+            }
         }
 
         public Task<FileSystemItem> CalcSize(string rootDir, CancellationToken cancellationToken) {
@@ -29,8 +35,8 @@ namespace SizeScanner.Model {
 
         FileSystemItem CalcSizeCore(string rootDir, CancellationToken cancellationToken) {
             cancellationToken.ThrowIfCancellationRequested();
-            var directoryInfo = new DirectoryInfo(rootDir);
-            DirectoryInfo[] childDirs;
+            var directoryInfo = FileSystemService.GetDirectoryInfo(rootDir);
+            IDirectoryInfo[] childDirs;
             try {
                 childDirs = directoryInfo.GetDirectories();
             }
@@ -76,13 +82,13 @@ namespace SizeScanner.Model {
             return fsRoot;
         }
 
-        FileSystemItem CalcSizePlain(DirectoryInfo root) {
+        FileSystemItem CalcSizePlain(IDirectoryInfo root) {
             var stack = new Stack<FileSystemItem>();
-            var queue = new Queue<(DirectoryInfo dirInfo, FileSystemItem fileSystem)>();
+            var queue = new Queue<(IDirectoryInfo dirInfo, FileSystemItem fileSystem)>();
             var result = new FileSystemItem(root.Name);
             queue.Enqueue((root, result));
             while (queue.Count > 0) {
-                (DirectoryInfo currentDirInfo, FileSystemItem currentFileSystemItem) = queue.Dequeue();
+                (IDirectoryInfo currentDirInfo, FileSystemItem currentFileSystemItem) = queue.Dequeue();
                 stack.Push(currentFileSystemItem);
                 try {
                     foreach (var childDirectoryInfo in currentDirInfo.EnumerateDirectories()) {

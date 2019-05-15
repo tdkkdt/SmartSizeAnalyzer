@@ -66,6 +66,7 @@
     <Compile Include="Model\Calculator.cs" />
     <Compile Include="Model\FileSystemItem.cs" />
     <Compile Include="Model\DirectoryModel.cs" />
+    <Compile Include="Model\FileSystemService.cs" />
     <Compile Include="Model\Services.cs" />
     <Compile Include="Model\ModelUpdater.cs" />
     <Compile Include="Properties\Annotations.cs" />
