@@ -12,6 +12,9 @@ namespace SmartPieChart {
         const int MinPieLevelSize = 20;
         const int MaxInnerCircleRadius = 80;
         const int MaxPieLevelSize = 80;
+        
+        const double normalThickness = 0.5;
+        const double selectedThickness = 1.5;
 
         double Diameter => Math.Min(RenderSize.Width, RenderSize.Height);
         double CenterCircleRadius => Math.Min(Math.Max(Diameter / 2 / MaxLevel, MinInnerCircleRadius), MaxInnerCircleRadius);
@@ -135,7 +138,7 @@ namespace SmartPieChart {
                     WedgeAngle = item.Size * wedgeAngle,
                     Fill = new SolidColorBrush(pieceColor),
                     Stroke = item.IsSpecial ? Brushes.White : Brushes.Black,
-                    StrokeThickness = 0.5,
+                    StrokeThickness = normalThickness,
                 };
                 piePiece.MouseEnter += PiePiece_MouseEnter;
                 piePiece.MouseLeave += PiePiece_MouseLeave;
@@ -160,6 +163,7 @@ namespace SmartPieChart {
             PiePiece piePiece = e.Source as PiePiece;
             if (piePiece == null)
                 return;
+            piePiece.StrokeThickness = selectedThickness;
             RaiseOnPieceMouseEnter(e, piePiece.GetFullLabel());
         }
 
@@ -175,6 +179,7 @@ namespace SmartPieChart {
             PiePiece piePiece = e.Source as PiePiece;
             if(piePiece == null)
                 return;
+            piePiece.StrokeThickness = normalThickness;
             RaiseOnPieceMouseLeave(e, piePiece.GetFullLabel());
         }
 
