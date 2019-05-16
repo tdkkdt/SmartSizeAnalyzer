@@ -68,6 +68,7 @@
     <Compile Include="Model\DirectoryModel.cs" />
     <Compile Include="Model\Services.cs" />
     <Compile Include="Model\ModelUpdater.cs" />
+    <Compile Include="Model\WinApi.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\Converters.cs" />
     <Compile Include="ViewModel\ViewModel.cs" />

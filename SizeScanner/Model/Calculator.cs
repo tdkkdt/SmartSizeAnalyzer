@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,7 +77,66 @@ namespace SizeScanner.Model {
             return fsRoot;
         }
 
+//        FileSystemItem CalcSizePlain(DirectoryInfo root) {
+//            var stack = new Stack<FileSystemItem>();
+//            var queue = new Queue<(string dirPath, FileSystemItem fileSystem)>();
+//            var result = new FileSystemItem(root.Name);
+//            queue.Enqueue((root.FullName, result));
+//            while (queue.Count > 0) {
+//                (string dirPath, FileSystemItem currentFileSystemItem) = queue.Dequeue();
+//                stack.Push(currentFileSystemItem);
+//                ProcessDirectory(dirPath, currentFileSystemItem, queue);
+//            }
+//            while (stack.Count > 0) {
+//                var currentFileSystemItem = stack.Pop();
+//                if(!currentFileSystemItem.IsValid)
+//                    continue;
+//                List<FileSystemItem> forRemoving = new List<FileSystemItem>();
+//                foreach (FileSystemItem childDirInfo in currentFileSystemItem.InnerItems) {
+//                    if(childDirInfo.IsValid) {
+//                        currentFileSystemItem.Size += childDirInfo.Size;
+//                    }
+//                    else {
+//                        forRemoving.Add(childDirInfo);
+//                    }
+//                }
+//                foreach (var fileSystemItem in forRemoving) {
+//                    currentFileSystemItem.InnerItems.Remove(fileSystemItem);
+//                }
+//            }
+//            return result;
+//        }
+//        static void ProcessDirectory(string dirPath, FileSystemItem currentFileSystemItem, Queue<(string dirPath, FileSystemItem fileSystem)> queue) {
+//            IntPtr findHandle = WinAPI.INVALID_HANDLE_VALUE;
+//            try {
+//                findHandle = WinAPI.FindFirstFileW(Path.Combine(dirPath, @"*"), out WinAPI.WIN32_FIND_DATAW findData);
+//                if(findHandle == WinAPI.INVALID_HANDLE_VALUE)
+//                    return;
+//                do {
+//                    if(findData.cFileName == "." || findData.cFileName == "..") continue;
+//                    if(findData.dwFileAttributes.HasFlag(FileAttributes.Directory) && !findData.dwFileAttributes.HasFlag(FileAttributes.ReparsePoint)) {
+//                        var childFileSystemItem = new FileSystemItem(findData.cFileName);
+//                        currentFileSystemItem.InnerItems.Add(childFileSystemItem);
+//                        queue.Enqueue((Path.Combine(dirPath, findData.cFileName), childFileSystemItem));
+//                    }
+//                    else if(!findData.dwFileAttributes.HasFlag(FileAttributes.Directory)) {
+//                        long length = ((long) findData.nFileSizeHigh << 32) + findData.nFileSizeLow;
+//                        currentFileSystemItem.InnerItems.Add(new FileSystemItem(findData.cFileName, length));
+//                    }
+//                } while (WinAPI.FindNextFile(findHandle, out findData));
+//            }
+//            catch {
+//                currentFileSystemItem.MakeInvalid();
+//            }
+//            finally {
+//                if(findHandle != WinAPI.INVALID_HANDLE_VALUE) {
+//                    WinAPI.FindClose(findHandle);
+//                }
+//            }
+//        }
+
         FileSystemItem CalcSizePlain(DirectoryInfo root) {
+            //TODO: Try to use 
             var stack = new Stack<FileSystemItem>();
             var queue = new Queue<(DirectoryInfo dirInfo, FileSystemItem fileSystem)>();
             var result = new FileSystemItem(root.Name);
@@ -85,10 +145,17 @@ namespace SizeScanner.Model {
                 (DirectoryInfo currentDirInfo, FileSystemItem currentFileSystemItem) = queue.Dequeue();
                 stack.Push(currentFileSystemItem);
                 try {
-                    foreach (var childDirectoryInfo in currentDirInfo.EnumerateDirectories()) {
-                        var childFileSystemItem = new FileSystemItem(childDirectoryInfo.Name);
-                        currentFileSystemItem.InnerItems.Add(childFileSystemItem);
-                        queue.Enqueue((childDirectoryInfo, childFileSystemItem));
+                    var innerDirectories = currentDirInfo.GetDirectories();
+                    if(innerDirectories.Length > 40) {
+                        //dirty hack
+                        ProcessInnerDirectoriesParallel(innerDirectories, currentFileSystemItem);
+                    }
+                    else {
+                        foreach (var childDirectoryInfo in innerDirectories) {
+                            var childFileSystemItem = new FileSystemItem(childDirectoryInfo.Name);
+                            currentFileSystemItem.InnerItems.Add(childFileSystemItem);
+                            queue.Enqueue((childDirectoryInfo, childFileSystemItem));
+                        }
                     }
                     foreach (var childFileInfo in currentDirInfo.EnumerateFiles()) {
                         currentFileSystemItem.InnerItems.Add(new FileSystemItem(childFileInfo));
@@ -116,6 +183,34 @@ namespace SizeScanner.Model {
                 }
             }
             return result;
+        }
+        void ProcessInnerDirectoriesParallel(DirectoryInfo[] innerDirectories, FileSystemItem currentFileSystemItem) {
+            SpinLock spinLock = new SpinLock();
+            const int tasksGroupSize = 4;
+            var tasks = new Task[tasksGroupSize];
+            int i = 0;
+            for (int j = 0; j < tasksGroupSize; j++) {
+                tasks[j] = Task.Factory.StartNew(() => {
+                    while (i < innerDirectories.Length) {
+                        int index = Interlocked.Increment(ref i);
+                        if(index == innerDirectories.Length) {
+                            return;
+                        }
+                        var innerItem = CalcSizePlain(innerDirectories[index]);
+                        bool lockTaken = false;
+                        try {
+                            spinLock.Enter(ref lockTaken);
+                            currentFileSystemItem.InnerItems.Add(innerItem);
+                        }
+                        finally {
+                            if(lockTaken) {
+                                spinLock.Exit();
+                            }
+                        }
+                    }
+                });
+            }
+            Task.WaitAll(tasks);
         }
     }
 }
