@@ -102,9 +102,17 @@ namespace SizeScanner.Model {
                 var currentFileSystemItem = stack.Pop();
                 if (!currentFileSystemItem.IsValid)
                     continue;
-                currentFileSystemItem.InnerItems.RemoveWhere(innerItem => !innerItem.IsValid);
+                List<FileSystemItem> forRemoving = new List<FileSystemItem>();
                 foreach (FileSystemItem childDirInfo in currentFileSystemItem.InnerItems) {
-                    currentFileSystemItem.Size += childDirInfo.Size;
+                    if(childDirInfo.IsValid) {
+                        currentFileSystemItem.Size += childDirInfo.Size;
+                    }
+                    else {
+                        forRemoving.Add(childDirInfo);
+                    }
+                }
+                foreach (var fileSystemItem in forRemoving) {
+                    currentFileSystemItem.InnerItems.Remove(fileSystemItem);
                 }
             }
             return result;

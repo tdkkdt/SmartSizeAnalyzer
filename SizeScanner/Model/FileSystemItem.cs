@@ -6,30 +6,10 @@ using System.Runtime.CompilerServices;
 using SizeScanner.Annotations;
 
 namespace SizeScanner.Model {
-    class FileSystemItem : IComparable<FileSystemItem>, INotifyPropertyChanged {
-        string name;
-        long size;
-        int propertyChangedSupressed = 0;
+    class FileSystemItem : IComparable<FileSystemItem> {
+        public string Name { get; private set; }
 
-        public string Name {
-            get => name;
-            private set {
-                if (value == name)
-                    return;
-                name = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public long Size {
-            get => size;
-            set {
-                if (value == size)
-                    return;
-                size = value;
-                OnPropertyChanged();
-            }
-        }
+        public long Size { get; set; }
 
         public bool IsValid { get; private set; }
         public SortedSet<FileSystemItem> InnerItems { get; }
@@ -88,24 +68,6 @@ namespace SizeScanner.Model {
 
         public override int GetHashCode() {
             return (Name != null ? Name.GetHashCode() : 0);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            if (propertyChangedSupressed != 0)
-                return;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void SuppressPropertyChanged() {
-            propertyChangedSupressed++;
-        }
-
-        public void PermitPropertyChanged() {
-            if (propertyChangedSupressed > 0)
-                propertyChangedSupressed--;
         }
     }
 }
